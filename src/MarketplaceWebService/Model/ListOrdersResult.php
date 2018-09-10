@@ -24,7 +24,7 @@ require_once ('MarketplaceWebService/Model.php');
     
 
 /**
- * MarketplaceWebService_Model_GetOrderListResult
+ * MarketplaceWebService_Model_ListOrdersResult
  * 
  * Properties:
  * <ul>
@@ -35,12 +35,12 @@ require_once ('MarketplaceWebService/Model.php');
  *
  * </ul>
  */ 
-class MarketplaceWebService_Model_GetOrderListResult extends MarketplaceWebService_Model
+class MarketplaceWebService_Model_ListOrdersResult extends MarketplaceWebService_Model
 {
 
 
     /**
-     * Construct new MarketplaceWebService_Model_GetOrderListResult
+     * Construct new MarketplaceWebService_Model_ListOrdersResult
      * 
      * @param mixed $data DOMElement or Associative Array to construct from. 
      * 
@@ -89,7 +89,7 @@ class MarketplaceWebService_Model_GetOrderListResult extends MarketplaceWebServi
      * Sets the value of the NextToken and returns this instance
      * 
      * @param string $value NextToken
-     * @return MarketplaceWebService_Model_GetOrderListResult instance
+     * @return MarketplaceWebService_Model_ListOrdersResult instance
      */
     public function withNextToken($value)
     {
@@ -134,7 +134,7 @@ class MarketplaceWebService_Model_GetOrderListResult extends MarketplaceWebServi
      * Sets the value of the HasNext and returns this instance
      * 
      * @param bool $value HasNext
-     * @return MarketplaceWebService_Model_GetOrderListResult instance
+     * @return MarketplaceWebService_Model_ListOrdersResult instance
      */
     public function withHasNext($value)
     {
@@ -185,7 +185,7 @@ class MarketplaceWebService_Model_GetOrderListResult extends MarketplaceWebServi
      * <code>withOrders($order1, $order2)</code>
      * 
      * @param Orders  $orderArgs one or more Orders
-     * @return MarketplaceWebService_Model_GetOrderListResult  instance
+     * @return MarketplaceWebService_Model_ListOrdersResult  instance
      */
     public function withOrders($orderArgs)
     {

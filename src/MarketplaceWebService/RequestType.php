@@ -18,10 +18,11 @@ final class RequestType {
       case 'SubmitFeed':
         $requestType = self::POST_UPLOAD;
         break;
-      case 'GetFeedSubmissionResult':
-      case 'GetReport':
         $requestType = self::POST_DOWNLOAD;
         break;
+      case 'GetFeedSubmissionResult':
+      case 'GetReport':
+	  case 'ListOrders':
       case 'GetFeedSubmissionList':
       case 'GetFeedSubmissionListByNextToken':
       case 'GetFeedSubmissionCount':

@@ -24,13 +24,13 @@ require_once ('MarketplaceWebService/Model.php');
     
 
 /**
- * MarketplaceWebService_Model_GetOrderListRequest
+ * MarketplaceWebService_Model_ListOrdersRequest
  * 
  * Properties:
  * <ul>
  * 
  * <li>Marketplace: string</li>
- * <li>Merchant: string</li>
+ * <li>SellerId: string</li>
  * <li>MWSAuthToken: string</li>
  * <li>CreatedAfter: string</li>
  * <li>CreatedBefore: string</li>
@@ -46,12 +46,12 @@ require_once ('MarketplaceWebService/Model.php');
  *
  * </ul>
  */ 
-class MarketplaceWebService_Model_GetOrderListRequest extends MarketplaceWebService_Model
+class MarketplaceWebService_Model_ListOrdersRequest extends MarketplaceWebService_Model
 {
 
 
     /**
-     * Construct new MarketplaceWebService_Model_GetOrderListRequest
+     * Construct new MarketplaceWebService_Model_ListOrdersRequest
      * 
      * @param mixed $data DOMElement or Associative Array to construct from. 
      * 
@@ -59,7 +59,7 @@ class MarketplaceWebService_Model_GetOrderListRequest extends MarketplaceWebServ
      * <ul>
      * 
  * <li>Marketplace: string</li>
- * <li>Merchant: string</li>
+ * <li>SellerId: string</li>
  * <li>MWSAuthToken: string</li>
  * <li>CreatedAfter: string</li>
  * <li>CreatedBefore: string</li>
@@ -78,8 +78,8 @@ class MarketplaceWebService_Model_GetOrderListRequest extends MarketplaceWebServ
     public function __construct($data = null)
     {
         $this->fields = array (
-		'Marketplace' => array('FieldValue' => null, 'FieldType' => 'string'),
-		'Merchant' => array('FieldValue' => null, 'FieldType' => 'string'),
+		/* 'Marketplace' => array('FieldValue' => null, 'FieldType' => 'string'), */
+		'SellerId' => array('FieldValue' => null, 'FieldType' => 'string'),
 		'MWSAuthToken' => array('FieldValue' => null, 'FieldType' => 'string'),
 		'CreatedAfter' => array('FieldValue' => null, 'FieldType' => 'string'),
 		'CreatedBefore' => array('FieldValue' => null, 'FieldType' => 'string'),
@@ -92,20 +92,26 @@ class MarketplaceWebService_Model_GetOrderListRequest extends MarketplaceWebServ
 		'PaymentMethod' => array('FieldValue' => null, 'FieldType' => 'MarketplaceWebService_Model_TypeList'),
 		'TFMShipmentStatus' => array('FieldValue' => null, 'FieldType' => 'MarketplaceWebService_Model_TypeList'),
 		'MaxResultsPerPage' => array('FieldValue' => null, 'FieldType' => 'int'),
+		'MarketplaceIdList' => array('FieldValue' => null, 'FieldType' => 'MarketplaceWebService_Model_IdList'),
         );
         parent::__construct($data);
     }
 
 
-public function getMarketplace() { return $this->fields['Marketplace']['FieldValue']; }
-public function setMarketplace($value) { $this->fields['Marketplace']['FieldValue'] = $value; return $this; }
-public function isSetMarketplace() { return !is_null($this->fields['Marketplace']['FieldValue']); }
-public function withMarketplace($value) { $this->setMarketplace($value); return $this; }
+public function getMarketplaceIdList() { return $this->fields['MarketplaceIdList']['FieldValue']; }
+public function setMarketplaceIdList($value) { $this->fields['MarketplaceIdList']['FieldValue'] = $value; return $this; }
+public function isSetMarketplaceIdList() { return !is_null($this->fields['MarketplaceIdList']['FieldValue']); }
+public function withMarketplaceIdList($value) { $this->setMarketplaceIdList($value); return $this; }
 
-public function getMerchant() { return $this->fields['Merchant']['FieldValue']; }
-public function setMerchant($value) { $this->fields['Merchant']['FieldValue'] = $value; return $this; }
-public function isSetMerchant() { return !is_null($this->fields['Merchant']['FieldValue']); }
-public function withMerchant($value) { $this->setMerchant($value); return $this; }
+public function getSellerId() { return $this->fields['SellerId']['FieldValue']; }
+public function setSellerId($value) { $this->fields['SellerId']['FieldValue'] = $value; return $this; }
+public function isSetSellerId() { return !is_null($this->fields['SellerId']['FieldValue']); }
+public function withSellerId($value) { $this->setSellerId($value); return $this; }
+
+public function getMWSAuthToken() { return $this->fields['MWSAuthToken']['FieldValue']; }
+public function setMWSAuthToken($value) { $this->fields['MWSAuthToken']['FieldValue'] = $value; return $this; }
+public function isSetMWSAuthToken() { return !is_null($this->fields['MWSAuthToken']['FieldValue']); }
+public function withMWSAuthToken($value) { $this->setMWSAuthToken($value); return $this; }
 
 public function getCreatedAfter() { return $this->fields['CreatedAfter']['FieldValue']; }
 public function setCreatedAfter($value) { $this->fields['CreatedAfter']['FieldValue'] = $value; return $this; }

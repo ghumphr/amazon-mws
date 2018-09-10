@@ -50,7 +50,7 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
                             'MaxErrorRetry' => 3,
   );
 
-  const SERVICE_VERSION = '2009-01-01';
+  const SERVICE_VERSION = '2013-09-01';
 
   const REQUEST_TYPE = "POST";
 
@@ -558,6 +558,33 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
   }
 
   /**
+   * Get Order List
+   * returns a list of reports; by default the most recent ten reports,
+   * regardless of their acknowledgement status
+   *
+   * @see http://docs.amazonwebservices.com/${docPath}ListOrders.html
+   * @param mixed $request array of parameters for MarketplaceWebService_Model_ListOrdersRequest request
+   * or MarketplaceWebService_Model_ListOrdersRequest object itself
+   * @see MarketplaceWebService_Model_ListOrders
+   * @return MarketplaceWebService_Model_ListOrdersResponse MarketplaceWebService_Model_ListOrdersResponse
+   *
+   * @throws MarketplaceWebService_Exception
+   */
+  public function listOrders($request)
+  {
+    if (!$request instanceof MarketplaceWebService_Model_ListOrdersRequest) {
+      require_once ('MarketplaceWebService/Model/ListOrdersRequest.php');
+      $request = new MarketplaceWebService_Model_ListOrdersRequest($request);
+    }
+    require_once ('MarketplaceWebService/Model/ListOrdersResponse.php');
+    $httpResponse = $this->invoke($this->convertListOrders($request), null, "/Orders/2013-09-01");
+	return $httpResponse['ResponseBody'];
+    $response = MarketplaceWebService_Model_ListOrdersResponse::fromXML($httpResponse['ResponseBody']);
+    $response->setResponseHeaderMetadata($httpResponse['ResponseHeaderMetadata']);
+    return $response;
+  }
+
+  /**
    * Get Feed Submission Result
    * retrieves the feed processing report
    *
@@ -683,6 +710,31 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
   }
 
   /**
+   * Get Order List By Next Token
+   * retrieve the next batch of list items and if there are more items to retrieve
+   *
+   * @see http://docs.amazonwebservices.com/${docPath}ListOrdersByNextToken.html
+   * @param mixed $request array of parameters for MarketplaceWebService_Model_ListOrdersByNextTokenRequest request
+   * or MarketplaceWebService_Model_ListOrdersByNextTokenRequest object itself
+   * @see MarketplaceWebService_Model_ListOrdersByNextToken
+   * @return MarketplaceWebService_Model_ListOrdersByNextTokenResponse MarketplaceWebService_Model_ListOrdersByNextTokenResponse
+   *
+   * @throws MarketplaceWebService_Exception
+   */
+  public function getOrderListByNextToken($request)
+  {
+    if (!$request instanceof MarketplaceWebService_Model_ListOrdersByNextTokenRequest) {
+      require_once ('MarketplaceWebService/Model/ListOrdersByNextTokenRequest.php');
+      $request = new MarketplaceWebService_Model_ListOrdersByNextTokenRequest($request);
+    }
+    require_once ('MarketplaceWebService/Model/ListOrdersByNextTokenResponse.php');
+    $httpResponse = $this->invoke($this->convertListOrdersByNextToken($request));
+    $response = MarketplaceWebService_Model_ListOrdersByNextTokenResponse::fromXML($httpResponse['ResponseBody']);
+    $response->setResponseHeaderMetadata($httpResponse['ResponseHeaderMetadata']);
+    return $response;
+  }
+
+  /**
    * Manage Report Schedule
    * Creates, updates, or deletes a report schedule
    * for a given report type, such as order reports in particular.
@@ -791,8 +843,9 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
   /**
    * Invoke request and return response
    */
-  private function invoke(array $converted, $dataHandle = null)
+  private function invoke(array $converted, $dataHandle = null, $queuepath = null)
   {
+	trigger_error("invoke: queuepath: $queuepath");
   	
   	$parameters = $converted[CONVERTED_PARAMETERS_KEY];
     $actionName = $parameters["Action"];
@@ -811,14 +864,14 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
     }
 
       /* Add required request parameters */
-      $parameters = $this->addRequiredParameters($parameters);
+      $parameters = $this->addRequiredParameters($parameters, $queuepath);
       $converted[CONVERTED_PARAMETERS_KEY] = $parameters;
 
       $shouldRetry = false;
       $retries = 0;
       do {
         try {
-          $response = $this->performRequest($actionName, $converted, $dataHandle);
+          $response = $this->performRequest($actionName, $converted, $dataHandle, $queuepath);
           
           $httpStatus = $response['Status'];
           
@@ -899,9 +952,9 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
    * @param $dataHandle - A stream handle to either a feed to upload, or a report/feed submission result to download.
    * @return array
    */
-  private function performRequest($action, array $converted, $dataHandle = null) {
+  private function performRequest($action, array $converted, $dataHandle = null, $queuepath = null) {
 
-    $curlOptions = $this->configureCurlOptions($action, $converted, $dataHandle);
+    $curlOptions = $this->configureCurlOptions($action, $converted, $dataHandle, $queuepath);
 
     if (is_null($curlOptions[CURLOPT_RETURNTRANSFER]) || !$curlOptions[CURLOPT_RETURNTRANSFER]) {
       $curlOptions[CURLOPT_RETURNTRANSFER] = true;
@@ -943,6 +996,8 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
     @fclose($this->headerContents);
     @fclose($this->errorResponseBody);
     curl_close($this->curlClient);
+	
+	trigger_error("response: $httpResponse");
 
     
     return array (
@@ -965,7 +1020,7 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
    * @return unknown_type
    */
   private function verifyContentMd5($receivedMd5Hash, $streamHandle) {
-    rewind($streamHandle);
+/*    rewind($streamHandle);
     $expectedMd5Hash = $this->getContentMd5($streamHandle);
     rewind($streamHandle);
 
@@ -975,7 +1030,7 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
           array(
             'Message' => 'Received Content-MD5 = ' . $receivedMd5Hash . ' but expected ' . $expectedMd5Hash, 
             'ErrorCode' => 'ContentMD5DoesNotMatch'));
-    }
+    } */
   }
 
   /**
@@ -1064,7 +1119,7 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
    * @param $streamHandle
    * @return array
    */
-  private function configureCurlOptions($action, array $converted, $streamHandle = null) {
+  private function configureCurlOptions($action, array $converted, $streamHandle = null, $queuepath = null) {
     $curlOptions = $this->getDefaultCurlOptions();
     
     if (!is_null($this->config['ProxyHost'])) {
@@ -1080,6 +1135,13 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
     if (!(substr($serviceUrl, strlen($serviceUrl) - 1) === '/')) {
       $serviceUrl .= '/';
     }
+	if($queuepath)
+	{
+		$serviceUrl .= $queuepath;
+		if (!(substr($serviceUrl, strlen($serviceUrl) - 1) === '/')) {
+		  $serviceUrl .= '/';
+		}		
+	}
 
     $requestType = RequestType::getRequestType($action);
 
@@ -1091,7 +1153,7 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
           array ('Message' => 'Missing stream resource.'));
       }
 
-      $serviceUrl .= '?' . $this->getParametersAsString($converted[CONVERTED_PARAMETERS_KEY]);
+      $serviceUrl .= '?' . $this->getParametersAsString($converted[CONVERTED_PARAMETERS_KEY], $queuepath);
 
       $curlOptions[CURLOPT_URL] = $serviceUrl;
       
@@ -1110,7 +1172,7 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
 
     } else if (!($requestType === RequestType::UNKNOWN)) {
       $curlOptions[CURLOPT_URL] = $this->config['ServiceURL'];
-      $curlOptions[CURLOPT_POSTFIELDS] = $this->getParametersAsString($converted[CONVERTED_PARAMETERS_KEY]);
+      $curlOptions[CURLOPT_POSTFIELDS] = $this->getParametersAsString($converted[CONVERTED_PARAMETERS_KEY], $queuepath);
 
       if ($requestType == RequestType::POST_DOWNLOAD) {
         $this->responseBodyContents = $streamHandle;
@@ -1119,6 +1181,9 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
     } else {
       throw new InvalidArgumentException("$action is not a valid request type.");
     }
+	
+	trigger_error("url: " . $curlOptions[CURLOPT_URL]);
+	trigger_error("fields: " . $curlOptions[CURLOPT_POSTFIELDS]);
 
     return $curlOptions;
   }
@@ -1165,8 +1230,9 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
   /**
    * Add authentication related and version parameters
    */
-  private function addRequiredParameters(array $parameters)
+  private function addRequiredParameters(array $parameters, $queuepath = null)
   {
+	trigger_error("addRequiredParameters: queuepath: $queuepath");
     $parameters['AWSAccessKeyId'] = $this->awsAccessKeyId;
     $parameters['Timestamp'] = $this->getFormattedTimestamp(new DateTime('now', new DateTimeZone('UTC')));
     $parameters['Version'] = self::SERVICE_VERSION;
@@ -1174,7 +1240,7 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
     if ($parameters['SignatureVersion'] > 1) {
       $parameters['SignatureMethod'] = $this->config['SignatureMethod'];
     }
-    $parameters['Signature'] = $this->signParameters($parameters, $this->awsSecretAccessKey);
+    $parameters['Signature'] = $this->signParameters($parameters, $this->awsSecretAccessKey, $queuepath);
 
     return $parameters;
   }
@@ -1215,7 +1281,8 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
    *       Pairs of parameter and values are separated by the '&' character (ASCII code 38).
    *
    */
-  private function signParameters(array $parameters, $key) {
+  private function signParameters(array $parameters, $key, $queuepath) {
+	trigger_error("signParameters: queuepath: $queuepath");
     $signatureVersion = $parameters['SignatureVersion'];
     $algorithm = "HmacSHA1";
     $stringToSign = null;
@@ -1228,7 +1295,7 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
     } else if (2 === $signatureVersion) {
       $algorithm = $this->config['SignatureMethod'];
       $parameters['SignatureMethod'] = $algorithm;
-      $stringToSign = $this->calculateStringToSignV2($parameters);
+      $stringToSign = $this->calculateStringToSignV2($parameters, $queuepath);
     } else {
       throw new Exception("Invalid Signature Version specified");
     }
@@ -1241,6 +1308,7 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
    * @return String to Sign
    */
   private function calculateStringToSignV2(array $parameters, $queuepath = null) {
+	trigger_error("calculateStringToSignV2: queuepath: $queuepath");
 
     $parsedUrl = parse_url($this->config['ServiceURL']);
     $endpoint = $parsedUrl['host'];
@@ -1263,6 +1331,8 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
     uksort($parameters, 'strcmp');
     $data .= $this->getParametersAsString($parameters);
     
+	trigger_error("string to sign: $data");
+	
     return $data;
   }
 
@@ -1730,6 +1800,102 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
 
 
     /**
+     * Convert ListOrdersRequest to name value pairs
+     */
+	// TODO: this needs specific values filled in for orders
+    private function convertListOrders($request) {
+		
+/* 
+		'Marketplace' => array('FieldValue' => null, 'FieldType' => 'string'),
+		'Merchant' => array('FieldValue' => null, 'FieldType' => 'string'),
+		'MWSAuthToken' => array('FieldValue' => null, 'FieldType' => 'string'),
+		'CreatedAfter' => array('FieldValue' => null, 'FieldType' => 'string'),
+		'CreatedBefore' => array('FieldValue' => null, 'FieldType' => 'string'),
+		'LastUpdatedAfter' => array('FieldValue' => null, 'FieldType' => 'string'),
+		'LastUpdatedBefore' => array('FieldValue' => null, 'FieldType' => 'string'),
+		'OrderStatusList' => array('FieldValue' => null, 'FieldType' => 'MarketplaceWebService_Model_TypeList'),
+		'FulfillmentChannelList' => array('FieldValue' => null, 'FieldType' => 'MarketplaceWebService_Model_IdList'),
+		'SellerOrderId' => array('FieldValue' => null, 'FieldType' => 'string'),
+		'BuyerEmail' => array('FieldValue' => null, 'FieldType' => 'string'),
+		'PaymentMethod' => array('FieldValue' => null, 'FieldType' => 'MarketplaceWebService_Model_TypeList'),
+		'TFMShipmentStatus' => array('FieldValue' => null, 'FieldType' => 'MarketplaceWebService_Model_TypeList'),
+		'MaxResultsPerPage' => array('FieldValue' => null, 'FieldType' => 'int'),
+*/		
+
+      $parameters = array();
+      $parameters['Action'] = 'ListOrders';
+      /*if ($request->isSetMarketplace()) {
+        $parameters['Marketplace'] =  $request->getMarketplace();
+      } */
+      if ($request->isSetSellerId()) {
+        $parameters['SellerId'] =  $request->getSellerId();
+      }
+      if ($request->isSetOrderStatusList()) {
+        $reportStatusList = $request->getOrderStatusList();
+        foreach  ($reportStatusList->getStatus() as $typeIndex => $type) {
+          $parameters['OrderStatusList' . '.' . 'Status' . '.'  . ($typeIndex + 1)] =  $type;
+        }
+      }
+      if ($request->isSetCreatedAfter()) {
+        $parameters['CreatedAfter'] =
+        $this->getFormattedTimestamp($request->getCreatedAfter());
+      }
+      if ($request->isSetCreatedBefore()) {
+        $parameters['CreatedBefore'] =
+        $this->getFormattedTimestamp($request->getCreatedBefore());
+      }
+      if ($request->isSetLastUpdatedAfter()) {
+        $parameters['LastUpdatedAfter'] =
+        $this->getFormattedTimestamp($request->getLastUpdatedAfter());
+      }
+      if ($request->isSetLastUpdatedBefore()) {
+        $parameters['LastUpdatedBefore'] =
+        $this->getFormattedTimestamp($request->getLastUpdatedBefore());
+      }
+
+      if ($request->isSetFulfillmentChannelList()) {
+        $reportRequestIdList = $request->getFulfillmentChannelList();
+        foreach  ($reportRequestIdList->getId() as $idIndex => $id) {
+          $parameters['FulfillmentChannelList' . '.' . 'Id' . '.'  . ($idIndex + 1)] =  $id;
+        }
+      }
+      if ($request->isSetSellerOrderId()) {
+        $parameters['SellerOrderId'] =  $request->getSellerOrderId();
+      }
+      if ($request->isSetBuyerEmail()) {
+        $parameters['BuyerEmail'] =  $request->getBuyerEmail();
+      }
+	  
+      if ($request->isSetMWSAuthToken()) {
+        $parameters['MWSAuthToken'] = $request->getMWSAuthToken();
+      }
+      if ($request->isSetPaymentMethod()) {
+        $reportRequestIdList = $request->getPaymentMethod();
+        foreach  ($reportRequestIdList->getId() as $idIndex => $id) {
+          $parameters['PaymentMethod' . '.' . 'Id' . '.'  . ($idIndex + 1)] =  $id;
+        }
+      }
+      if ($request->isSetTFMShipmentStatus()) {
+        $reportRequestIdList = $request->getTFMShipmentStatus();
+        foreach  ($reportRequestIdList->getId() as $idIndex => $id) {
+          $parameters['TFMShipmentStatus' . '.' . 'Id' . '.'  . ($idIndex + 1)] =  $id;
+        }
+      }
+      if ($request->isSetMarketplaceIdList()) {
+		$marketplaceIdList = $request->getMarketplaceIdList();
+        foreach  ($marketplaceIdList->getId() as $idIndex => $id) {
+          $parameters['MarketplaceId.Id.'.($idIndex + 1)] =  $id;
+        }       
+      }
+      if ($request->isSetMaxResultsPerPage()) {
+        $parameters['MaxResultsPerPage'] = $request->getMaxResultsPerPage();
+      }
+
+      return array(CONVERTED_PARAMETERS_KEY => $parameters, CONVERTED_HEADERS_KEY => $this->defaultHeaders);
+    }
+
+
+    /**
      * Convert GetFeedSubmissionResultRequest to name value pairs
      */
     private function convertGetFeedSubmissionResult($request) {
@@ -1884,6 +2050,30 @@ class MarketplaceWebService_Client implements MarketplaceWebService_Interface
 
       $parameters = array();
       $parameters['Action'] = 'GetReportListByNextToken';
+      if ($request->isSetMarketplace()) {
+        $parameters['Marketplace'] =  $request->getMarketplace();
+      }
+      if ($request->isSetMerchant()) {
+        $parameters['Merchant'] =  $request->getMerchant();
+      }
+      if ($request->isSetNextToken()) {
+        $parameters['NextToken'] =  $request->getNextToken();
+      }
+      if ($request->isSetMWSAuthToken()) {
+        $parameters['MWSAuthToken'] = $request->getMWSAuthToken();
+      }
+
+      return array(CONVERTED_PARAMETERS_KEY => $parameters, CONVERTED_HEADERS_KEY => $this->defaultHeaders);
+    }
+
+
+    /**
+     * Convert ListOrdersByNextTokenRequest to name value pairs
+     */
+    private function convertListOrdersByNextToken($request) {
+
+      $parameters = array();
+      $parameters['Action'] = 'ListOrdersByNextToken';
       if ($request->isSetMarketplace()) {
         $parameters['Marketplace'] =  $request->getMarketplace();
       }

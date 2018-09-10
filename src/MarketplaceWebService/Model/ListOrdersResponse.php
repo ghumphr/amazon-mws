@@ -24,29 +24,29 @@ require_once ('MarketplaceWebService/Model.php');
     
 
 /**
- * MarketplaceWebService_Model_GetOrderListResponse
+ * MarketplaceWebService_Model_ListOrdersResponse
  * 
  * Properties:
  * <ul>
  * 
- * <li>GetOrderListResult: MarketplaceWebService_Model_GetOrderListResult</li>
+ * <li>ListOrdersResult: MarketplaceWebService_Model_ListOrdersResult</li>
  * <li>ResponseMetadata: MarketplaceWebService_Model_ResponseMetadata</li>
  *
  * </ul>
  */ 
-class MarketplaceWebService_Model_GetOrderListResponse extends MarketplaceWebService_Model
+class MarketplaceWebService_Model_ListOrdersResponse extends MarketplaceWebService_Model
 {
 
 
     /**
-     * Construct new MarketplaceWebService_Model_GetOrderListResponse
+     * Construct new MarketplaceWebService_Model_ListOrdersResponse
      * 
      * @param mixed $data DOMElement or Associative Array to construct from. 
      * 
      * Valid properties:
      * <ul>
      * 
-     * <li>GetOrderListResult: MarketplaceWebService_Model_GetOrderListResult</li>
+     * <li>ListOrdersResult: MarketplaceWebService_Model_ListOrdersResult</li>
      * <li>ResponseMetadata: MarketplaceWebService_Model_ResponseMetadata</li>
      *
      * </ul>
@@ -54,7 +54,7 @@ class MarketplaceWebService_Model_GetOrderListResponse extends MarketplaceWebSer
     public function __construct($data = null)
     {
         $this->fields = array (
-        'GetOrderListResult' => array('FieldValue' => null, 'FieldType' => 'MarketplaceWebService_Model_GetOrderListResult'),
+        'ListOrdersResult' => array('FieldValue' => null, 'FieldType' => 'MarketplaceWebService_Model_ListOrdersResult'),
         'ResponseMetadata' => array('FieldValue' => null, 'FieldType' => 'MarketplaceWebService_Model_ResponseMetadata'),
         );
         parent::__construct($data);
@@ -62,10 +62,10 @@ class MarketplaceWebService_Model_GetOrderListResponse extends MarketplaceWebSer
 
        
     /**
-     * Construct MarketplaceWebService_Model_GetOrderListResponse from XML string
+     * Construct MarketplaceWebService_Model_ListOrdersResponse from XML string
      * 
      * @param string $xml XML string to construct from
-     * @return MarketplaceWebService_Model_GetOrderListResponse 
+     * @return MarketplaceWebService_Model_ListOrdersResponse 
      */
     public static function fromXML($xml)
     {
@@ -73,59 +73,59 @@ class MarketplaceWebService_Model_GetOrderListResponse extends MarketplaceWebSer
         $dom->loadXML($xml);
         $xpath = new DOMXPath($dom);
     	$xpath->registerNamespace('a', 'http://mws.amazonaws.com/doc/2009-01-01/');
-        $response = $xpath->query('//a:GetOrderListResponse');
+        $response = $xpath->query('//a:ListOrdersResponse');
         if ($response->length == 1) {
-            return new MarketplaceWebService_Model_GetOrderListResponse(($response->item(0))); 
+            return new MarketplaceWebService_Model_ListOrdersResponse(($response->item(0))); 
         } else {
-            throw new Exception ("Unable to construct MarketplaceWebService_Model_GetOrderListResponse from provided XML. 
-                                  Make sure that GetOrderListResponse is a root element");
+            throw new Exception ("Unable to construct MarketplaceWebService_Model_ListOrdersResponse from provided XML. 
+                                  Make sure that ListOrdersResponse is a root element");
         }
           
     }
     
     /**
-     * Gets the value of the GetOrderListResult.
+     * Gets the value of the ListOrdersResult.
      * 
-     * @return GetOrderListResult GetOrderListResult
+     * @return ListOrdersResult ListOrdersResult
      */
-    public function getGetOrderListResult() 
+    public function getListOrdersResult() 
     {
-        return $this->fields['GetOrderListResult']['FieldValue'];
+        return $this->fields['ListOrdersResult']['FieldValue'];
     }
 
     /**
-     * Sets the value of the GetOrderListResult.
+     * Sets the value of the ListOrdersResult.
      * 
-     * @param GetOrderListResult GetOrderListResult
+     * @param ListOrdersResult ListOrdersResult
      * @return void
      */
-    public function setGetOrderListResult($value) 
+    public function setListOrdersResult($value) 
     {
-        $this->fields['GetOrderListResult']['FieldValue'] = $value;
+        $this->fields['ListOrdersResult']['FieldValue'] = $value;
         return;
     }
 
     /**
-     * Sets the value of the GetOrderListResult  and returns this instance
+     * Sets the value of the ListOrdersResult  and returns this instance
      * 
-     * @param GetOrderListResult $value GetOrderListResult
-     * @return MarketplaceWebService_Model_GetOrderListResponse instance
+     * @param ListOrdersResult $value ListOrdersResult
+     * @return MarketplaceWebService_Model_ListOrdersResponse instance
      */
-    public function withGetOrderListResult($value)
+    public function withListOrdersResult($value)
     {
-        $this->setGetOrderListResult($value);
+        $this->setListOrdersResult($value);
         return $this;
     }
 
 
     /**
-     * Checks if GetOrderListResult  is set
+     * Checks if ListOrdersResult  is set
      * 
-     * @return bool true if GetOrderListResult property is set
+     * @return bool true if ListOrdersResult property is set
      */
-    public function isSetGetOrderListResult()
+    public function isSetListOrdersResult()
     {
-        return !is_null($this->fields['GetOrderListResult']['FieldValue']);
+        return !is_null($this->fields['ListOrdersResult']['FieldValue']);
 
     }
 
@@ -155,7 +155,7 @@ class MarketplaceWebService_Model_GetOrderListResponse extends MarketplaceWebSer
      * Sets the value of the ResponseMetadata  and returns this instance
      * 
      * @param ResponseMetadata $value ResponseMetadata
-     * @return MarketplaceWebService_Model_GetOrderListResponse instance
+     * @return MarketplaceWebService_Model_ListOrdersResponse instance
      */
     public function withResponseMetadata($value)
     {
@@ -185,9 +185,9 @@ class MarketplaceWebService_Model_GetOrderListResponse extends MarketplaceWebSer
     public function toXML() 
     {
         $xml = "";
-        $xml .= "<GetOrderListResponse xmlns=\"http://mws.amazonaws.com/doc/2009-01-01/\">";
+        $xml .= "<ListOrdersResponse xmlns=\"http://mws.amazonaws.com/doc/2009-01-01/\">";
         $xml .= $this->_toXMLFragment();
-        $xml .= "</GetOrderListResponse>";
+        $xml .= "</ListOrdersResponse>";
         return $xml;
     }
 

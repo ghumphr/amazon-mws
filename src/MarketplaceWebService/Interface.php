@@ -229,6 +229,23 @@ interface  MarketplaceWebService_Interface
 
             
     /**
+     * Get Order List 
+     * returns a list of reports; by default the most recent ten reports,
+     * regardless of their acknowledgement status
+     *   
+     * @see http://docs.amazonwebservices.com/${docPath}ListOrders.html      
+     * @param mixed $request array of parameters for MarketplaceWebService_Model_ListOrdersRequest request
+     * or MarketplaceWebService_Model_ListOrdersRequest object itself
+     * @see MarketplaceWebService_Model_ListOrdersRequest
+     * @return MarketplaceWebService_Model_ListOrdersResponse MarketplaceWebService_Model_ListOrdersResponse
+     *
+     * @throws MarketplaceWebService_Exception
+     */
+    public function listOrders($request);
+
+
+            
+    /**
      * Get Feed Submission Result 
      * retrieves the feed processing report
      *   
@@ -305,6 +322,22 @@ interface  MarketplaceWebService_Interface
      * @throws MarketplaceWebService_Exception
      */
     public function getReportListByNextToken($request);
+
+
+            
+    /**
+     * Get Order List By Next Token 
+     * retrieve the next batch of list items and if there are more items to retrieve
+     *   
+     * @see http://docs.amazonwebservices.com/${docPath}ListOrdersByNextToken.html      
+     * @param mixed $request array of parameters for MarketplaceWebService_Model_ListOrdersByNextTokenRequest request
+     * or MarketplaceWebService_Model_ListOrdersByNextTokenRequest object itself
+     * @see MarketplaceWebService_Model_ListOrdersByNextTokenRequest
+     * @return MarketplaceWebService_Model_ListOrdersByNextTokenResponse MarketplaceWebService_Model_ListOrdersByNextTokenResponse
+     *
+     * @throws MarketplaceWebService_Exception
+     */
+    public function getOrderListByNextToken($request);
 
 
             
